@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Recipe Africa</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_share">Share</string>
+    <string name="action_reviews">Reviews</string>
+
+    <string-array name="menu_items">
+        <item>Recipes</item>
+        <item>Add a recipe</item>
+        <item>Search</item>
+    </string-array>
+
+    <string name="drawer_close">Close drawer</string>
+    <string name="drawer_open">Open drawer</string>
+    <string name="title_activity_add_recipe">Add a new Recipe</string>
+    <string name="title_activity_detail">Recipe Details</string>
+    <string name="title_activity_recipe_detail">Recipe Details</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="rating_qtn">Rate this recipe!</string>
+
+</resources>
