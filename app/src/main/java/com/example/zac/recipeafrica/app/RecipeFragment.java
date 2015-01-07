@@ -9,15 +9,13 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.zac.recipeafrica.app.data.RecipeContract;
+import com.example.zac.recipeafrica.app.service.FetchRecipesTask;
 
 /**
  * Created by ZAC on 12/17/2014.
@@ -40,9 +38,9 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
             RecipeContract.RecipeEntry.RECIPE_COLUMN_STEPS
     };
 
-
-    public static final int COL_RECIPE_TITLE = 1;
-    public static final int COL_RECIPE_DESC = 2;
+    public static final int COL_RECIPE_KEY = 1;
+    public static final int COL_RECIPE_TITLE = 2;
+    public static final int COL_RECIPE_DESC = 3;
 
 
     public interface Callback {
@@ -57,14 +55,14 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public void updateRecipeDb() {
-        FetchRecipesTask fetchRecipesTask = new FetchRecipesTask(mContext);
+        FetchRecipesTask fetchRecipesTask = new FetchRecipesTask(getActivity().getBaseContext());
         fetchRecipesTask.execute();
 //        Intent intent = new Intent(getActivity(), FetchRecipesService.class);
 //        getActivity().startService(intent);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-       updateRecipeDb();
+
         recipeAdapter = new RecipeAdapter(getActivity(), null, 0);
         View view = inflater.inflate(R.layout.fragment_recipe, container, false);
 
@@ -93,13 +91,14 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+
         getLoaderManager().initLoader(RECIPE_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
+        updateRecipeDb();
         String sortOrder = RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_ID + " DESC";
 
         Uri recipeUri = RecipeContract.RecipeEntry.CONTENT_URI;
@@ -139,20 +138,20 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
 
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_recipe_fragment, menu);
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            updateRecipeDb();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_recipe_fragment, menu);
+//
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.action_refresh) {
+//            updateRecipeDb();
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//
+//    }
 }

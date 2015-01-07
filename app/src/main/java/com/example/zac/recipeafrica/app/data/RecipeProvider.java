@@ -99,7 +99,7 @@ public class RecipeProvider extends ContentProvider {
         Uri returnUri;
 
         if (match == RECIPES) {
-            long _id = db.insert(RecipeContract.RecipeEntry.RECIPE_TABLE, null, contentValues);
+            Long _id = db.insert(RecipeContract.RecipeEntry.RECIPE_TABLE, null, contentValues);
             if ( _id > 0 )
                 returnUri = RecipeContract.RecipeEntry.buildRecipeUri(_id);
             else

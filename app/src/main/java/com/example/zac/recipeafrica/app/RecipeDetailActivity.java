@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 public class RecipeDetailActivity extends ActionBarActivity {
 
-    public static final String RECIPE_KEY = "recipe_name";
+    public static final String RECIPE_KEY = "recipeName";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -32,10 +32,7 @@ public class ReviewsFragment extends Fragment {
                 0
                 );
 
-
         reviewList.setAdapter(reviewAdapter);
-
         return view;
     }
-
     }

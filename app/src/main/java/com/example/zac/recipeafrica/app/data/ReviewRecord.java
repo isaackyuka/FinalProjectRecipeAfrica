@@ -1,9 +1,11 @@
 package com.example.zac.recipeafrica.app.data;
 
+import java.io.Serializable;
+
 /**
  * Created by ZAC on 12/23/2014.
  */
-public class ReviewRecord {
+public class ReviewRecord implements Serializable {
     Long recipeID;
     String username;
     String comment;

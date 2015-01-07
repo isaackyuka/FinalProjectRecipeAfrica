@@ -54,7 +54,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper{
         onCreate(sqLiteDatabase);
     }
 
-    public void saveReview(int recipeID, String username, String comment, int rating) {
+    public void saveReview(Long recipeID, String username, String comment,Long rating) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues commentValues = new ContentValues();
 

@@ -139,13 +139,6 @@ public class MainActivity extends ActionBarActivity implements RecipeFragment.Ca
                 ft.commit();
                 break;
 
-            case 2:
-                newFragment = new SearchFragment();
-                // Adding a fragment to the fragment transaction
-                ft.replace(R.id.content_frame, newFragment);
-                // Committing the transaction
-                ft.commit();
-                break;
 
             default:
                 break;
@@ -195,13 +188,13 @@ public class MainActivity extends ActionBarActivity implements RecipeFragment.Ca
 
 
     @Override
-    public void onItemSelected(String recipeID) {
+    public void onItemSelected(String recipeName) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle args = new Bundle();
-            args.putString(RecipeDetailActivity.RECIPE_KEY, recipeID);
+            args.putString(RecipeDetailActivity.RECIPE_KEY, recipeName);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(args);
@@ -211,7 +204,7 @@ public class MainActivity extends ActionBarActivity implements RecipeFragment.Ca
                     .commit();
         } else {
             Intent intent = new Intent(this, RecipeDetailActivity.class)
-                    .putExtra(RecipeDetailActivity.RECIPE_KEY, recipeID);
+                    .putExtra(RecipeDetailActivity.RECIPE_KEY, recipeName);
             startActivity(intent);
         }
     }

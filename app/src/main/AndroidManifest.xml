@@ -31,8 +31,6 @@
             android:name=".data.RecipeProvider"
             android:authorities="com.example.zac.recipeafrica.app" />
 
-        <service android:name=".service.SearchIntentService" />
-        <service android:name=".service.FetchRecipesService" />
 
     </application>
 

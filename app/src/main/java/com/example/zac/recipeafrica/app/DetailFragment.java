@@ -26,18 +26,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.zac.myapplication.backend.recipeApi.RecipeApi;
 import com.example.zac.myapplication.backend.recipeApi.model.ReviewBean;
 import com.example.zac.recipeafrica.app.data.RecipeContract;
-import com.example.zac.recipeafrica.app.data.RecipeDbHelper;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 
 import java.io.IOException;
+import java.util.Random;
 
 
 /**
@@ -45,13 +44,11 @@ import java.io.IOException;
  */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-
     ReviewAdapter reviewAdapter;
-
     private  static final String RECIPE_SHARE_HASHTAG = "#RecipeAfrica";
-    public static final String RECIPE_KEY = "recipe_name";
+    public static final String RECIPE_KEY = "recipeName";
     private String recipe;
-    public Long recipeID;
+    public Long recipeKey;
     public int tag;
     private ShareActionProvider mShareActionProvider;
 
@@ -59,11 +56,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final String[] RECIPE_COLUMNS = {
             RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_ID,
+            RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_KEY,
             RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_NAME,
             RecipeContract.RecipeEntry.RECIPE_COLUMN_DESCRIPTION,
             RecipeContract.RecipeEntry.RECIPE_COLUMN_INGREDIENTS,
             RecipeContract.RecipeEntry.RECIPE_COLUMN_STEPS
-
     };
 
     private TextView titleView;
@@ -73,9 +70,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private EditText username;
     private EditText comment;
-    RecipeDbHelper dbHelper;
     private CheckBox star;
-    private ListView reviewList;
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -87,7 +83,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         setHasOptionsMenu(true);
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.containsKey(RecipeDetailActivity.RECIPE_KEY) &&
+                recipe != null) {
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,7 +120,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 public void onClick(View v) {
                    tag = Integer.valueOf((String) v.getTag());
 //---check all the stars up to the one touched---
-
                     for (int i = 1; i <= tag; i++) {
                         star = (CheckBox) rootView.findViewWithTag(String.valueOf(i));
                         star.setChecked(true);
@@ -132,74 +135,36 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         // Review form
        username = (EditText) rootView.findViewById(R.id.usernameEdit);
-
        comment = (EditText) rootView.findViewById(R.id.reviewEdit);
 
-//        reviewList = (ListView) rootView.findViewById(R.id.list_view_reviews);
-//        reviewList.setOnTouchListener(new ListView.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                int action = event.getAction();
-//                switch (action) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        // Disallow ScrollView to intercept touch events.
-//                        v.getParent().requestDisallowInterceptTouchEvent(true);
-//                        break;
-//
-//                    case MotionEvent.ACTION_UP:
-//                        // Allow ScrollView to intercept touch events.
-//                        v.getParent().requestDisallowInterceptTouchEvent(false);
-//                        break;
-//                }
-//
-//                // Handle ListView touch events.
-//                v.onTouchEvent(event);
-//                return true;
-//            }
-//        });
+//       Save the review
         Button addReview = (Button) rootView.findViewById(R.id.addReviewBtn);
-
         addReview.setOnClickListener(onAddReview);
 
         return rootView;
     }
 
+
     public View.OnClickListener onAddReview = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
           AddReviewTask addReviewTask = new AddReviewTask();
             addReviewTask.execute();
+            username.setText("");
+            comment.setText("");
             Toast.makeText(getActivity(), "Thank you for the review.", Toast.LENGTH_LONG).show();
-
         }
     };
 
 
     public static DetailFragment newInstance(String recipe) {
         DetailFragment f = new DetailFragment();
-
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putString("recipe", recipe);
         f.setArguments(args);
-
         return f;
     }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(RecipeDetailActivity.RECIPE_KEY) &&
-                recipe != null) {
-            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
-
-
-        }
-    }
-
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -217,9 +182,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_detail, menu);
-
         MenuItem menuItem = menu.findItem(R.id.action_share);
-
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
         // If onLoadFinished happens before this, we can go ahead and set the share intent now.
@@ -269,7 +232,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             return;
         }
 
-        recipeID = Long.valueOf(data.getInt(data.getColumnIndex(RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_ID)));
+        recipeKey = data.getLong(data.getColumnIndex(RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_KEY));
 
         String title = data.getString(data.getColumnIndex(RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_NAME));
         ((TextView) getView().findViewById(R.id.detail_title)).setText(title);
@@ -283,7 +246,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         String steps = data.getString(data.getColumnIndex(RecipeContract.RecipeEntry.RECIPE_COLUMN_STEPS));
         ((TextView) getView().findViewById(R.id.detail_steps)).setText(steps);
 
-        recipe = String.format("%s /n %s ", title, description);
+        recipe = String.format("%s - %s ", title, description);
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActionProvider != null) {
@@ -293,8 +256,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
-
     }
 
     public class AddReviewTask extends AsyncTask<Void, Void, Void> {
@@ -303,25 +264,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         @Override
         protected Void doInBackground(Void... params) {
             if (recipeApiService == null) {
-
                 RecipeApi.Builder builder = new RecipeApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                         .setRootUrl("https://ace-fiber-802.appspot.com/_ah/api/");
                 recipeApiService = builder.build();
             }
 
-
             String userText = username.getText().toString();
             String commentText = comment.getText().toString();
 
-            Long id = Long.valueOf(recipeID);
+//            Long recipeId = Long.valueOf(recipeID);
+            Random r = new Random();
+            int reviewId = r.nextInt(Integer.MAX_VALUE);
+            Long id = Long.valueOf(reviewId);
 
             try {
-
                 ReviewBean reviewBean = new ReviewBean();
                 reviewBean.setRating(Long.valueOf(tag));
                 reviewBean.setComment(commentText);
                 reviewBean.setUsername(userText);
-                reviewBean.setRecipeId(recipeID);
+                reviewBean.setRecipeId(recipeKey);
                 reviewBean.setId(id);
 
                 recipeApiService.saveReview(reviewBean).execute();
@@ -329,22 +290,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             } catch (IOException e) {
                 Log.e(DetailFragment.class.getSimpleName(), "Error when saving review", e);
             }
-//
-//            dbHelper = new RecipeDbHelper(getActivity().getBaseContext());
-////            ReviewRecord review = new ReviewRecord(1, userText, commentText, tag);
-////            dbHelper.addReview(review);
-//            dbHelper.saveReview(recipeID, userText, commentText, tag);
-//            Toast.makeText(getActivity().getBaseContext(), "Review added", Toast.LENGTH_LONG).show();
-//
-//            dbHelper = new RecipeDbHelper(getActivity().getBaseContext());
-//
-//
-//            reviewAdapter = new ReviewAdapter(getActivity().getBaseContext(),
-//                    dbHelper.getReviews(),
-//                    0
-//            );
-//
-//            reviewList.setAdapter(reviewAdapter);
 
             return null;
         }

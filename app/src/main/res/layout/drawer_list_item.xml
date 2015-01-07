@@ -7,11 +7,9 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:textColor="#000"
-    android:textSize="20sp"
+    android:textSize="16sp"
     android:layout_marginTop="10dp"
     android:background="?android:attr/activatedBackgroundIndicator"
     android:minHeight="?android:attr/listPreferredItemHeightSmall"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    >
-
-</TextView>
+   />

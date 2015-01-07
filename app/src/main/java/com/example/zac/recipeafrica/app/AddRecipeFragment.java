@@ -53,21 +53,7 @@ public class AddRecipeFragment extends Fragment {
      public View.OnClickListener onSave = new View.OnClickListener() {
          @Override
          public void onClick(View v) {
-                         //Inserting the recipe into the database
-//             ContentValues recipeValues = new ContentValues();
-//
-//             String title = etitle.getText().toString();
-//             String description = edescription.getText().toString();
-//             String ingredients = eingredients.getText().toString();
-//             String steps = esteps.getText().toString();
-//
-//             recipeValues.put(RecipeContract.RecipeEntry.RECIPE_COLUMN_RECIPE_NAME, title);
-//             recipeValues.put(RecipeContract.RecipeEntry.RECIPE_COLUMN_DESCRIPTION, description);
-//             recipeValues.put(RecipeContract.RecipeEntry.RECIPE_COLUMN_INGREDIENTS, ingredients);
-//             recipeValues.put(RecipeContract.RecipeEntry.RECIPE_COLUMN_STEPS, steps);
-//
-//             recipeInsertUri = getActivity().getContentResolver().insert(RecipeContract.RecipeEntry.CONTENT_URI, recipeValues);
-//
+
              StoreRecipeTask storeRecipeTask = new StoreRecipeTask();
              storeRecipeTask.execute();
 

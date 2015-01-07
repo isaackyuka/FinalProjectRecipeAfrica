@@ -105,6 +105,45 @@ public class MyEndpoint {
         Key reviewBeanParentKey = KeyFactory.createKey("ReviewBeanParent", "RecipeAfrica");
 
         Query query = new Query(reviewBeanParentKey);
+
+      List<Entity> results = datastoreService.prepare(query).asList(FetchOptions.Builder.withDefaults());
+
+        ArrayList<ReviewBean> reviewBeans = new ArrayList<ReviewBean>();
+        for (Entity result : results) {
+            ReviewBean reviewBean = new ReviewBean();
+            reviewBean.setId(result.getKey().getId());
+            reviewBean.setRecipeId((Long) result.getProperty("recipeId"));
+            reviewBean.setUsername((String) result.getProperty("username"));
+            reviewBean.setComment((String) result.getProperty("comment"));
+            reviewBean.setRating((Long) result.getProperty("rating"));
+            reviewBeans.add(reviewBean);
+        }
+        return reviewBeans;
+    }
+
+    @ApiMethod(name = "getReviewsForRecipe")
+    public List<ReviewBean> getReviewsForRecipe(@Named("recipeId") Long recipeId) {
+        DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+        Key reviewBeanParentKey = KeyFactory.createKey("ReviewBeanParent", "RecipeAfrica");
+
+//        Query query = new Query(reviewBeanParentKey);
+//        // Use PreparedQuery interface to retrieve results
+//        PreparedQuery pq = datastore.prepare(query);
+//
+//
+//        for (Entity result : pq.asIterable()) {
+//            String firstName = (String) result.getProperty("firstName");
+//            String lastName = (String) result.getProperty("lastName");
+//            Long height = (Long) result.getProperty("height");
+//
+//            System.out.println(firstName + " " + lastName + ", " + height + " inches tall");
+//        }
+        Query.Filter propertyFilter =
+                new Query.FilterPredicate("recipeId",
+                        Query.FilterOperator.EQUAL,
+                        recipeId);
+//        Query q = new Query("Person").setFilter(propertyFilter);
+        Query query = new Query("ReviewBean").setFilter(propertyFilter);
         List<Entity> results = datastoreService.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
         ArrayList<ReviewBean> reviewBeans = new ArrayList<ReviewBean>();
